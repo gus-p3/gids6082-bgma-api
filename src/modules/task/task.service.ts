@@ -1,28 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 
 @Injectable()
 export class TaskService {
 
+  constructor(@Inject('PG_CONNECTION') private db: any) { }
+
   private tasks: any[] = [];
 
-  getTasks() {
-    return this.tasks;
+async getTasks() {
+    const query = 'SELECT * FROM tasks';
+    const result = await this.db.query(query);
+    return result.rows;
   }
 
-  getTaskById(id: number): any {
-    var task = this.tasks.find(task => task.id === id);
-    return task;
+  async getTaskById(id: number): Promise<any> {
+    const query = 'SELECT * FROM tasks WHERE id = $1';
+    const result = await this.db.query(query, [id]);
+    return result.rows[0];
   }
-
   insertTask(task: CreateTaskDto): CreateTaskDto {
     const id = this.tasks.length + 1;
-    this.tasks.push({...task, id });
+    const newTask = { ...task, id };
+    this.tasks.push(newTask);
 
-
-    return this.tasks[id];
+    return newTask;
   }
-
   updateTask(id: number, task: any): any {
     const taskUpdate = this.tasks.map(t => {
       if (t.id === id) {
