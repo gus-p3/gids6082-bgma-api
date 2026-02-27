@@ -40,11 +40,21 @@ export class TaskService {
 
   async updateTask(id: number, taskUpdate: UpdateTaskDto): Promise<Task> {
     const task = await this.getTaskById(id);
-    console.log("Tarea encontrada:", taskUpdate);
 
     task.name = taskUpdate.name ? taskUpdate.name : task.name;
     task.description = taskUpdate.description ? taskUpdate.description : task.description;
     task.priority = taskUpdate.priority !== undefined ? taskUpdate.priority : task.priority;
+
+    const query = `
+    UPDATE tasks 
+    SET name = '${task.name}', 
+    description = '${task.description}', 
+    priority = ${task.priority} 
+    WHERE id = ${id} RETURNING *`;
+
+    const result = await this.db.query(query);
+  
+    return result.rows[0];
 
     //Convertir el objeto a un set
     //{name: 'abc', description: 'desc'}
@@ -56,19 +66,13 @@ export class TaskService {
     // const result = await this.db.query(sql);
     // return result.rows[0];
 
-    return task;
-
   }
 
-  deleteTask(id: number): string {
-    const initialLength = this.tasks.length;
+  async deleteTask(id: number): Promise<boolean> {
+    const query = `DELETE FROM tasks WHERE id=${id}`;
 
-    this.tasks = this.tasks.filter(task => task.id !== id);
+    const result = await this.db.query(query);
 
-    if (this.tasks.length < initialLength) {
-      return "Tarea eliminada correctamente";
-    } else {
-      return "Tarea no encontrada";
-    }
+    return result.rowCount > 0;
   }
 }

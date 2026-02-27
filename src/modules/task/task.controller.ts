@@ -3,8 +3,10 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('api/task')
+@ApiTags("Tareas")
 export class TaskController {
   constructor(private readonly taskSvc: TaskService) { }
 
@@ -26,21 +28,27 @@ export class TaskController {
   }
 
   @Post()
-  public insertTask(@Body() task: CreateTaskDto) {
-    const result = this.taskSvc.insertTask(task)
+  @ApiOperation({ summary: 'Insert a task in the db' })
+  public async insertTask(@Body() task: CreateTaskDto): Promise<Task> {
+    const result = await this.taskSvc.insertTask(task)
 
     if (result == undefined)
       throw new HttpException("Tarea no registrada", HttpStatus.INTERNAL_SERVER_ERROR)
     return result;
   }
-  
+
   @Put(":id")
-  public updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto) {
-    return this.taskSvc.updateTask(id, task);
+  public async updateTask(@Param("id", ParseIntPipe) id: number, @Body() task: UpdateTaskDto): Promise<Task> {
+    return await this.taskSvc.updateTask(id, task);
   }
 
   @Delete(':id')
-  public deleteTask(@Param("id", ParseIntPipe) id: number) {
-    return this.taskSvc.deleteTask(id);
+  public async deleteTask(@Param("id", ParseIntPipe) id: number): Promise<boolean> {
+    const result = await this.taskSvc.deleteTask(id);
+
+    if (!result) {
+     throw new HttpException(`No se puede eliminar la tarea con ID ${id}`, HttpStatus.NOT_FOUND);
+    }
+    return result;
   }
 }
