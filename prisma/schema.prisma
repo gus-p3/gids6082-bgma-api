@@ -22,6 +22,7 @@ model User {
   password   String
   created_dt DateTime @default(now()) @db.Date
   tasks      Task[]
+  refreshToken String @default("")
 }
 
 model Task {

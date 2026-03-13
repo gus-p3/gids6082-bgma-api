@@ -2,10 +2,10 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../services/prisma.service';
 import { User } from './entities/user.entitie';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from '../auth/dto/login.dto';
 import { ConflictException } from '@nestjs/common';
 import { Task } from '../task/entities/task.entity';
 import { UtilService } from '../../services/util.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -30,6 +30,7 @@ export class UserService {
           lastname: true,
           username: true,
           password: true,
+          refreshToken: true,
           created_dt: true
         }
       }

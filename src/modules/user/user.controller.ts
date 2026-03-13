@@ -13,11 +13,11 @@ import {
   InternalServerErrorException,
   HttpStatus
 } from '@nestjs/common';
-import { CreateUserDto } from '../auth/dto/login.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { User } from './entities/user.entitie';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('api/user')
 export class UserController {
