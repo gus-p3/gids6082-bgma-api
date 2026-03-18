@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../services/prisma.service';
 import { UtilService } from '../../services/util.service';
-import { LoginDto } from './dto/login.dto';
+import { AuthDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 
 
@@ -13,7 +13,8 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) { }
 
-  async login(loginDto: LoginDto): Promise<any> {
+
+  async login(loginDto: AuthDto): Promise<any> {
     const { username, password } = loginDto;
 
     const user = await this.prisma.user.findUnique({
@@ -34,7 +35,7 @@ export class AuthService {
     //2 metodos para: Obtener el playload, y otro para generar el token enviando el playload y la fecha de expiración
     const playload = await this.utilSvc.getPayload(user);
 
-    const accessToken = await this.utilSvc.generateToken(playload, '60s');
+    const accessToken = await this.utilSvc.generateToken(playload, '60000s');
 
     //Generar un refresh token por 7 dias (Guardarlo en la Base de datos)
     const refreshToken = await this.utilSvc.generateToken(playload, '7d');
@@ -43,12 +44,9 @@ export class AuthService {
     //Retornar access token y el refresh token.
     await this.prisma.user.update({where:{id:user.id}, data:{refreshToken: refreshToken}});
 
-    const decryptedPayload = await this.jwtService.verifyAsync(accessToken);
-
     return {
       accessToken,
-      refreshToken,
-      decryptedPayload
+      refreshToken
     };
   }
 

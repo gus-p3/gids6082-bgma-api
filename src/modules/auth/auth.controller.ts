@@ -5,7 +5,7 @@ import {
   HttpCode
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
+import { AuthDto } from './dto/auth.dto';
 
 
 @Controller('api/auth')
@@ -14,7 +14,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  async login(@Body() loginDto: LoginDto): Promise<any> {
+  async login(@Body() loginDto: AuthDto): Promise<any> {
     return this.authSvc.login(loginDto);
   }
 }

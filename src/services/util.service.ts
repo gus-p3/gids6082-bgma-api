@@ -28,10 +28,16 @@ export class UtilService {
         }
     }
 
-public async generateToken(payload: any, expiresIn: string): Promise<string> {
-    const jwt = await this.jwtService.signAsync(payload, { 
-        expiresIn: expiresIn as any
-    });
-    return jwt;
-}
+
+    public async getPayloadFromJWT(token: string): Promise<any> {
+        return await this.jwtService.verifyAsync(token);
+    }
+
+
+    public async generateToken(payload: any, expiresIn: any = '10000s'): Promise<string> {
+        const jwt = await this.jwtService.signAsync(payload, {
+            expiresIn: expiresIn as any
+        });
+        return jwt;
+    }
 }

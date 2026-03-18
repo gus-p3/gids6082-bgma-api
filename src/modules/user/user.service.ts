@@ -30,7 +30,6 @@ export class UserService {
           lastname: true,
           username: true,
           password: true,
-          refreshToken: true,
           created_dt: true
         }
       }

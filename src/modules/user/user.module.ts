@@ -4,9 +4,15 @@ import { UserService } from './user.service';
 import { PrismaService } from '../../services/prisma.service';
 import { pgProvider } from '../../common/providers/pg.provider';
 import { UtilService } from '../../services/util.service';
-
+import { AuthGuard } from '../../common/guards/auth.guard';
 @Module({
   controllers: [UserController],
-  providers: [UserService, PrismaService, pgProvider[0], UtilService],
+  providers: [
+    UserService, 
+    PrismaService, 
+    UtilService, 
+    AuthGuard    
+  ],
 })
+
 export class UserModule {}

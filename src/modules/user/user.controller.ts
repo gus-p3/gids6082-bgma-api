@@ -11,15 +11,19 @@ import {
   HttpException,
   NotFoundException,
   InternalServerErrorException,
-  HttpStatus
+  HttpStatus,
+  UseGuards
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entitie';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { AuthGuard } from '../../common/guards/auth.guard';
 
 @Controller('api/user')
+@ApiTags("Users")
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private userSvc: UserService) { }
 
