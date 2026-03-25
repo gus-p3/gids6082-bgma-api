@@ -25,8 +25,8 @@ export class CreateTaskDto {
     @IsBoolean()
     priority!: boolean;
 
-    @IsNumber()
-    @IsInt()
-    user_id!: number;
+    // @IsNumber()
+    // @IsInt()
+    // user_id: number;
 
 }

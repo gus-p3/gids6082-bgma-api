@@ -1,8 +1,9 @@
-import { CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Request } from "express"; 
 import { JwtService } from "@nestjs/jwt";
 import { UtilService } from "../../services/util.service";
 
+@Injectable()
 export class AuthGuard implements CanActivate {
 
     constructor(private readonly jwtSvc: JwtService, private readonly utilSvc: UtilService) { }
@@ -28,7 +29,6 @@ export class AuthGuard implements CanActivate {
             // TODO: Devolver el resultado
             return true;
         } catch (error) {
-            // Si el token falló por expiración o firma
             throw new UnauthorizedException();
         }
     }

@@ -30,7 +30,8 @@ export class UtilService {
 
 
     public async getPayloadFromJWT(token: string): Promise<any> {
-        return await this.jwtService.verifyAsync(token);
+        const payload = await this.jwtService.verifyAsync(token);
+        return payload;
     }
 
 

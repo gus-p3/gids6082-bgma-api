@@ -35,7 +35,7 @@ export class AuthService {
     //2 metodos para: Obtener el playload, y otro para generar el token enviando el playload y la fecha de expiración
     const playload = await this.utilSvc.getPayload(user);
 
-    const accessToken = await this.utilSvc.generateToken(playload, '60000s');
+    const accessToken = await this.utilSvc.generateToken(playload, '1h');
 
     //Generar un refresh token por 7 dias (Guardarlo en la Base de datos)
     const refreshToken = await this.utilSvc.generateToken(playload, '7d');
