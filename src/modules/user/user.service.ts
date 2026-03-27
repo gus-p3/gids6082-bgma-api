@@ -69,7 +69,7 @@ export class UserService {
       throw new ConflictException(`El usuario con el username '${username}' ya existe`);
     }
 
-    const encryptedPassword = await this.utilSvc.hashPassword(password);
+    const encryptedPassword = await this.utilSvc.hash(password);
 
     const newUser = await this.prisma.user.create({
       data: {

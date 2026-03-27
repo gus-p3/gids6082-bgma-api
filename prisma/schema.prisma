@@ -27,11 +27,12 @@ model User {
   lastname     String   @db.VarChar(205)
   username     String   @unique @db.VarChar(150)
   password     String
+  hash         String?
   created_dt   DateTime @default(now()) @db.Date
   tasks        Task[]
   refreshToken String   @default("")
   rol_id       Int?
-  rol          Rol?     @relation(fields: [rol_id], references: [id]) // Agregado ?
+  rol          Rol?     @relation(fields: [rol_id], references: [id])
 }
 
 model Task {

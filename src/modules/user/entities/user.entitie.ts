@@ -4,5 +4,6 @@ export class User {
     lastname: string | undefined;
     username: string | undefined;
     password?: string | undefined;
+    hash?: string | null | undefined;
     created_dt: Date | undefined;
 }
