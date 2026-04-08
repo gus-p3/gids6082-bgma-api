@@ -33,6 +33,7 @@ model User {
   refreshToken String   @default("")
   rol_id       Int?
   rol          Rol?     @relation(fields: [rol_id], references: [id])
+  logs         Logs[]
 }
 
 model Task {
@@ -43,4 +44,16 @@ model Task {
   created_dt  DateTime @default(now()) @db.Date
   user_id     Int
   user        User     @relation(fields: [user_id], references: [id])
+}
+
+model Logs {
+  id         Int      @id @default(autoincrement())
+  statusCode Int
+  timeStamp  DateTime
+  path       String   @db.VarChar(200)
+  error      String   @db.VarChar(200)
+  errorCode  String   @db.VarChar(200)
+  sesion_id Int?
+  
+  user      User? @relation(fields: [sesion_id], references: [id])
 }

@@ -17,20 +17,24 @@ export class AuthService {
 
   async login(loginDto: AuthDto): Promise<any> {
     const { username, password } = loginDto;
+    console.log(`Intento de login con username: "${username}", password length: ${password?.length}`);
 
     const user = await this.prisma.user.findUnique({
       where: { username }
     });
 
     if (!user) {
+      console.log('Login fallido: Usuario no existe en DB');
       throw new UnauthorizedException('Credenciales invalidas');
     }
 
     const isPasswordValid = await this.utilSvc.checkPassword(password, user.password);
 
     if (!isPasswordValid) {
+      console.log('Login fallido: Contraseña incorrecta');
       throw new UnauthorizedException('Credenciales invalidas');
     }
+    console.log('Login exitoso para:', username);
     const payload = await this.utilSvc.getPayload(user);
 
     //Generar un token por 60 segundos (id, name, lastname, created_at)
