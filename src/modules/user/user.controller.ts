@@ -12,7 +12,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   HttpStatus,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entitie';
@@ -20,15 +20,21 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Role } from '../../common/enums/role.enum';
 
 @Controller('api/user')
-@ApiTags("Users")
-
+@ApiTags('Users')
 export class UserController {
   constructor(private userSvc: UserService) { }
 
+  /**
+   * Listar todos los usuarios — solo ADMIN.
+   */
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   public async getUser(): Promise<User[]> {
     try {
       return await this.userSvc.getUsers();
@@ -37,10 +43,14 @@ export class UserController {
     }
   }
 
+  /**
+   * Obtener un usuario por ID — cualquier usuario autenticado.
+   * (Útil para que el propio usuario vea su perfil desde la app móvil.)
+   */
   @Get(':id')
   @HttpCode(200)
   @UseGuards(AuthGuard)
-  public async getUserById(@Param("id", ParseIntPipe) id: number): Promise<User> {
+  public async getUserById(@Param('id', ParseIntPipe) id: number): Promise<User> {
     try {
       const user = await this.userSvc.getUserById(id);
 
@@ -55,31 +65,38 @@ export class UserController {
     }
   }
 
+  /**
+   * Crear un nuevo usuario — ruta pública (registro).
+   * El rol 'user' se asigna automáticamente si no se especifica.
+   */
   @Post()
-  @ApiOperation({ summary: 'Insert a user in the db' })
+  @ApiOperation({ summary: 'Registrar un usuario nuevo (rol "user" por defecto)' })
   public async insertUser(@Body() user: CreateUserDto): Promise<User> {
     try {
-      
       const result = await this.userSvc.insertUser(user);
       if (!result) {
-        throw new InternalServerErrorException("El usuario no pudo ser registrado");
+        throw new InternalServerErrorException('El usuario no pudo ser registrado');
       }
       return result;
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new InternalServerErrorException("Error interno al registrar el usuario");
+      throw new InternalServerErrorException('Error interno al registrar el usuario');
     }
   }
 
-  @Put(":id")
+  /**
+   * Actualizar perfil — solo el propio usuario autenticado.
+   */
+  @Put(':id')
+  @UseGuards(AuthGuard)
   public async updateUser(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() user: UpdateUserDto
+    @Param('id', ParseIntPipe) id: number,
+    @Body() user: UpdateUserDto,
   ): Promise<User> {
     try {
-      const result = await this.userSvc.getUserById(id);
+      const existing = await this.userSvc.getUserById(id);
 
-       if (!user) {
+      if (!existing) {
         throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
       }
 
@@ -90,14 +107,17 @@ export class UserController {
     }
   }
 
+  /**
+   * Eliminar usuario — solo ADMIN.
+   */
   @Delete(':id')
-  public async deleteUser(@Param("id", ParseIntPipe) id: number): Promise<boolean> {
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  public async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
     const result = await this.userSvc.deleteUser(id);
 
-
-    // FIXME: Verificar si el usuario tiene tareas
     if (!result) {
-      throw new HttpException(``, HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
     return true;
   }

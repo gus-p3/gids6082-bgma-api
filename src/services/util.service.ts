@@ -1,14 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
-import { User } from "../generated/prisma/client";
 
 @Injectable()
 export class UtilService {
     constructor(
         private jwtService: JwtService
     ) { }
-
 
     public async hash(password: string): Promise<string> {
         return await bcrypt.hash(password, 10);
@@ -18,27 +16,30 @@ export class UtilService {
         return await bcrypt.compare(password, hash);
     }
 
-    public async getPayload(user: User): Promise<any> {
+    /**
+     * Construye el payload para el JWT a partir del usuario completo
+     * (incluyendo la relación Rol para incluir el rol en el token).
+     */
+    public async getPayload(user: any): Promise<any> {
         return {
             id: user.id,
             name: user.name,
             lastname: user.lastname,
             username: user.username,
             created_dt: user.created_dt,
-            hash: user.hash
-        }
+            hash: user.hash,
+            role: user.rol?.description ?? 'user',
+        };
     }
-
 
     public async getPayloadFromJWT(token: string): Promise<any> {
         const payload = await this.jwtService.verifyAsync(token);
         return payload;
     }
 
-
     public async generateToken(payload: any, expiresIn: any = '10000s'): Promise<string> {
         const jwt = await this.jwtService.signAsync(payload, {
-            expiresIn: expiresIn as any
+            expiresIn: expiresIn as any,
         });
         return jwt;
     }

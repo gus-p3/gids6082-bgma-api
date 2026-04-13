@@ -53,7 +53,7 @@ model Logs {
   path       String   @db.VarChar(200)
   error      String   @db.VarChar(200)
   errorCode  String   @db.VarChar(200)
-  sesion_id Int?
-  
-  user      User? @relation(fields: [sesion_id], references: [id])
+  sesion_id  Int?
+
+  user User? @relation(fields: [sesion_id], references: [id])
 }

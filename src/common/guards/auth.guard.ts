@@ -19,7 +19,6 @@ export class AuthGuard implements CanActivate {
         }
 
         try {
-            console.log(token);
             // TODO: Si el token existe verificar el tiempo de expiracion
             const payload = await this.utilSvc.getPayloadFromJWT(token);
 

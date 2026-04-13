@@ -50,9 +50,14 @@ export class TaskService {
     return task;
   }
 
-  async deleteTask(id: number, user_id:number): Promise<boolean> {
-    const deletedTask = await this.prisma.task.delete({ where: { id, user_id } });
-
+  /**
+   * Elimina una tarea.
+   * Si `user_id` es 0, el filtro por propietario se omite (uso exclusivo para administradores).
+   */
+  async deleteTask(id: number, user_id: number): Promise<boolean> {
+    // user_id = 0 indica que un admin puede eliminar sin importar el propietario
+    const whereClause = user_id === 0 ? { id } : { id, user_id };
+    const deletedTask = await this.prisma.task.delete({ where: whereClause });
     return deletedTask ? true : false;
   }
 }
